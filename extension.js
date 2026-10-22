@@ -17,40 +17,47 @@
  */
 
 /* exported Extension */
-import Gio from 'gi://Gio';
+import Gio from "gi://Gio";
 
-const DEFAULT_SCHEME_NAME = 'default';
-const LIGHT_SCHEME_NAME = 'prefer-light';
-const DARK_SCHEME_NAME = 'prefer-dark';
+const DEFAULT_SCHEME_NAME = "default";
+const LIGHT_SCHEME_NAME = "prefer-light";
+const DARK_SCHEME_NAME = "prefer-dark";
 
 export default class LegacyThemeSchemeAutoSwitcher {
     handleThemeChange = (theme_name) => {
-        switch(theme_name)
-        {
+        switch (theme_name) {
             case DEFAULT_SCHEME_NAME:
             case LIGHT_SCHEME_NAME:
-                if (this.schema.get_string('gtk-theme').endsWith("-dark")) {
-                    this.schema.set_string('gtk-theme', this.schema.get_string('gtk-theme').slice(0,-5));
+                if (this.schema.get_string("gtk-theme").endsWith("-dark")) {
+                    this.schema.set_string(
+                        "gtk-theme",
+                        this.schema.get_string("gtk-theme").slice(0, -5),
+                    );
                 }
+                this.schema.set_string("icon-theme", "Papirus-Light");
                 break;
             case DARK_SCHEME_NAME:
-                if (!this.schema.get_string('gtk-theme').endsWith("-dark")) {
-                    this.schema.set_string('gtk-theme', this.schema.get_string('gtk-theme') + "-dark");
+                if (!this.schema.get_string("gtk-theme").endsWith("-dark")) {
+                    this.schema.set_string(
+                        "gtk-theme",
+                        this.schema.get_string("gtk-theme") + "-dark",
+                    );
                 }
+                this.schema.set_string("icon-theme", "Papirus-Dark");
                 break;
             default:
                 break;
         }
-    }
+    };
 
     handleCurrentTheme = () => {
-        let value = this.schema.get_string('color-scheme');
+        let value = this.schema.get_string("color-scheme");
         this.handleThemeChange(value);
-    }
+    };
 
     enable() {
-        this.schema = Gio.Settings.new('org.gnome.desktop.interface');
-        this.id = this.schema.connect('changed::color-scheme', () => {
+        this.schema = Gio.Settings.new("org.gnome.desktop.interface");
+        this.id = this.schema.connect("changed::color-scheme", () => {
             this.handleCurrentTheme();
         });
         this.handleCurrentTheme();
